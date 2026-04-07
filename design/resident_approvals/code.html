@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Resident Requests &amp; Approval Flow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#4d93e5",
+                      "on-primary-fixed-variant": "#004883",
+                      "error-container": "#93000a",
+                      "outline-variant": "#414751",
+                      "surface-tint": "#a4c9ff",
+                      "surface-container": "#201f1f",
+                      "on-primary-fixed": "#001c39",
+                      "secondary-fixed-dim": "#3ce36a",
+                      "on-background": "#e5e2e1",
+                      "surface-container-high": "#2a2a2a",
+                      "background": "#131313",
+                      "surface-bright": "#393939",
+                      "on-tertiary": "#313030",
+                      "outline": "#8b919d",
+                      "on-secondary": "#003912",
+                      "primary-fixed-dim": "#a4c9ff",
+                      "on-surface": "#e5e2e1",
+                      "surface-container-highest": "#353534",
+                      "tertiary": "#c8c6c5",
+                      "inverse-primary": "#0060ac",
+                      "on-tertiary-fixed": "#1c1b1b",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-error": "#690005",
+                      "surface-container-low": "#1c1b1b",
+                      "on-error-container": "#ffdad6",
+                      "on-surface-variant": "#c1c7d3",
+                      "on-primary-container": "#002a51",
+                      "surface-dim": "#131313",
+                      "error": "#ffb4ab",
+                      "tertiary-fixed-dim": "#c8c6c5",
+                      "primary-fixed": "#d4e3ff",
+                      "inverse-surface": "#e5e2e1",
+                      "on-tertiary-container": "#2a2a29",
+                      "surface-variant": "#353534",
+                      "primary": "#a4c9ff",
+                      "on-secondary-fixed": "#002108",
+                      "secondary": "#40e56c",
+                      "secondary-fixed": "#69ff87",
+                      "on-secondary-container": "#004d1b",
+                      "surface": "#131313",
+                      "on-tertiary-fixed-variant": "#474646",
+                      "inverse-on-surface": "#313030",
+                      "tertiary-container": "#929090",
+                      "on-primary": "#00315d",
+                      "tertiary-fixed": "#e5e2e1",
+                      "secondary-container": "#02c953",
+                      "on-secondary-fixed-variant": "#00531e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #131313; color: #e5e2e1; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-card { background: rgba(53, 53, 52, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(164, 201, 255, 0.05); }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 z-50 w-full flex items-center justify-between px-6 h-16 bg-[#131313] shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#a4c9ff] font-headline">Architect Ledger Admin</span>
+<div class="hidden md:flex relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">search</span>
+<input class="bg-surface-container-highest border-none rounded-lg pl-10 pr-4 py-1.5 text-sm w-64 focus:ring-1 focus:ring-primary/40 transition-all" placeholder="Search Ledgers..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-zinc-500 hover:bg-white/5 transition-colors rounded-lg scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-zinc-500 hover:bg-white/5 transition-colors rounded-lg scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">shield_lock</span>
+</button>
+<button class="p-2 text-zinc-500 hover:bg-white/5 transition-colors rounded-lg scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high ml-2 border border-primary/20">
+<img alt="Administrator profile" data-alt="Professional administrator portrait in high-contrast architectural lighting with a minimalist dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaVJWX86-l91KBcsZYiMBCNFYYlpituKVEmOPVc8Kx_19gF14GYOOC2N7pkaB_kUbzJ2NHxgvB2R1VESe9Qo1PVKYpzfWLduCVXmeE86hG2tr2xpD4rZ8JyZpRFGk23qQ4aG9D4xlLqK8Q8q_ehqEwj0bEF5_GzKP-9yvHVYVDhprvWKfqpsTCgLDd15TVjite-uLueG0x5TjFGK8_rab6ka3JWcklGUYraCGAW-WPpxOn8QgCkp-OwvgH7wfZ6S3CAxhBOBz8uyq3"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="hidden md:flex h-screen w-64 fixed left-0 top-0 bg-[#131313] flex flex-col py-8 px-4 z-40">
+<div class="mt-16 mb-10 px-2">
+<h2 class="text-[#a4c9ff] uppercase tracking-widest text-xs font-bold font-headline">Building Console</h2>
+<p class="text-zinc-500 text-[10px] uppercase tracking-wider mt-1">High-Security Zone</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-medium text-sm font-body">Structure</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">security_update_good</span>
+<span class="font-medium text-sm font-body">Security</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg bg-gradient-to-r from-[#a4c9ff]/10 to-transparent text-[#a4c9ff] border-r-2 border-[#a4c9ff] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">approval_delegation</span>
+<span class="font-medium text-sm font-body">Requests</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-medium text-sm font-body">Governance</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-medium text-sm font-body">Analytics</span>
+</a>
+</nav>
+<div class="pt-6 border-t border-white/5 space-y-1">
+<div class="px-3 py-2 mb-4">
+<div class="flex items-center gap-2">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</span>
+<span class="text-[11px] text-secondary font-bold tracking-wide uppercase">System Status: Live</span>
+</div>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/5" href="#">
+<span class="material-symbols-outlined text-xl">help</span>
+<span class="text-sm font-body">Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/5" href="#">
+<span class="material-symbols-outlined text-xl">history</span>
+<span class="text-sm font-body">Logs</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="md:ml-64 pt-24 pb-12 px-6 md:px-10 min-h-screen bg-background">
+<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h1 class="text-4xl font-extrabold tracking-tight font-headline text-on-surface mb-2">Resident Requests</h1>
+<p class="text-on-surface-variant max-w-2xl font-body">Manage and verify architectural access credentials for new tenants and property owners.</p>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-low p-1.5 rounded-xl">
+<button class="px-4 py-2 bg-surface-container-highest text-primary text-xs font-bold rounded-lg transition-all">Pending (12)</button>
+<button class="px-4 py-2 text-zinc-500 text-xs font-bold rounded-lg hover:text-on-surface transition-all">Reviewing (4)</button>
+<button class="px-4 py-2 text-zinc-500 text-xs font-bold rounded-lg hover:text-on-surface transition-all">Resolved</button>
+</div>
+</header>
+<!-- Bento Grid Stats Section -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+<div class="md:col-span-1 bg-surface-container-low p-6 rounded-xl flex flex-col justify-between">
+<span class="text-xs text-zinc-500 uppercase tracking-widest font-bold">New Today</span>
+<div class="flex items-baseline gap-2 mt-4">
+<span class="text-4xl font-headline font-extrabold text-secondary">08</span>
+<span class="text-zinc-500 text-sm font-body">+12%</span>
+</div>
+</div>
+<div class="md:col-span-1 bg-surface-container-low p-6 rounded-xl flex flex-col justify-between">
+<span class="text-xs text-zinc-500 uppercase tracking-widest font-bold">Avg. Audit Time</span>
+<div class="flex items-baseline gap-2 mt-4">
+<span class="text-4xl font-headline font-extrabold text-on-surface">1.2h</span>
+<span class="text-secondary text-sm font-body">Optimized</span>
+</div>
+</div>
+<div class="md:col-span-2 bg-primary/5 p-6 rounded-xl relative overflow-hidden group">
+<div class="relative z-10">
+<span class="text-xs text-primary font-bold uppercase tracking-widest">Pending Review Priority</span>
+<div class="mt-4 flex -space-x-3">
+<img class="w-10 h-10 rounded-full border-2 border-background ring-2 ring-primary/10" data-alt="Close-up portrait of a professional man in high-quality executive lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnftsMCUYVpcLavZ2Xc4OtM_ImE1yRmPmFpD3LsE4GSx7Jrb3xLDhLSm4vAaH34MlXA8Lwyezpjvu6NPs0RXq6w9OrfESWI_DZSwx-zYaMULB6CHkrbRiA344H0wC1CsFI447nZP2elbyI02E4Z0RtnA5OdCSHFHCf7-KZRPfx2_tfgqlPWoPOPKUs1c74_RN4ODend07ur4CCetHJtR23xKsAi81aI-gc-d3b5EzzrOdp8SPQWDTIevvpnICGa_bNu-OSqa_uH23v"/>
+<img class="w-10 h-10 rounded-full border-2 border-background ring-2 ring-primary/10" data-alt="Portrait of a creative woman with a confident expression in a dark studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuysukBY-Dov8vVe3dsqzAfGRPlyWXQXjjs29fYPevFRggKWslUpZD-SupSs3EmO0-L0qQsPtZexglCix23CIxXgKWiv3ZpmRWbMMlevsVVftgBSinOohhNXZ859A46lYtx81yEOJZhn1hvOAyTMwY5BuZaVMh614JtNjL7c6p_DNQC-t97TTHSCtGkIDpEJ-_Tw9JjiEQ-dqKhgJEQHF4fOn4T8E1lU5FOnHNhQwpA5LU3XzF4mzbV5l0uB0rrPzMmoTapWvi6sNc"/>
+<img class="w-10 h-10 rounded-full border-2 border-background ring-2 ring-primary/10" data-alt="Portrait of a young male professional in a modern architectural environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8oi9Ic-juqi1Ne_XsCk3xTuYhJUVBMD7a7EURJP4mQ8C_VHApegWLSDvKSGkIhyyrCwSIoYHPEV5gMIb3t9-69Q2y4ekWnhSkVq2xmplov-zGQZ6rLiDcV_YrBsCgvGVFkd_j7OqY4Duazacv6mQ7bCy8sXg2e4CfzZUTwwiSIbi8cBjl4HIuley40XqdZrFAQOkHbIyQfMKlxFnGSCqBpfVTkdoWCc9NvEot3_LzKguMmZUOgqoWAssjohgmvN-scoZJmTrjie0O"/>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-background flex items-center justify-center text-[10px] font-bold">+9</div>
+</div>
+</div>
+<span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-primary opacity-5 group-hover:rotate-12 transition-transform duration-700">verified_user</span>
+</div>
+</section>
+<!-- Requests List -->
+<section class="space-y-4">
+<!-- Request Item 1 -->
+<div class="glass-card rounded-2xl p-6 flex flex-col lg:flex-row lg:items-center gap-8 transition-all hover:bg-surface-container-high/50 group">
+<div class="flex items-center gap-4 min-w-[280px]">
+<div class="w-14 h-14 rounded-xl bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img class="object-cover w-full h-full" data-alt="Confident female property owner in a sharp black blazer against a dark gray background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbLfZkfjb5r_o_mqFBtGZ6tUFyIdDdG1uL15P9aWo1ICTNDq7tESpXqAZhCMZ7yDQJAZcusLehi2S6fV5Wz7QV3R00ng0fb6DyVROZHca3mO5zDy71ToD9sBizZ8ga45rV7dugB_aMVNCocnF-qmRH6zoN6rqQuZglDKOUPZ8hinY6dtW0auD0rY8LgHTnP6WVQijeh_MLvQ3ytLqSEBgWcYIMM_WbrLdwdVgdcXhgwYo5vtPxhv7ijGRVZJQ_NlSiLnELkq2D7f2Y"/>
+</div>
+<div>
+<h3 class="font-headline font-bold text-on-surface">Eleanor Vance</h3>
+<p class="text-xs text-zinc-500 font-body">Submitted 2h ago</p>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 flex-1 gap-6">
+<div>
+<span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1 block">Unit Number</span>
+<span class="text-primary font-headline font-bold text-lg tracking-tight">PH-402</span>
+</div>
+<div>
+<span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1 block">Type</span>
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
+<span class="text-sm font-body text-on-surface">Property Owner</span>
+</div>
+</div>
+<div class="col-span-2 md:col-span-1">
+<span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1 block">Verification Proof</span>
+<button class="flex items-center gap-2 text-xs font-bold py-1 px-3 bg-surface-container-highest rounded hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-sm">description</span>
+                            DEED_SCAN_PH402.PDF
+                        </button>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex-1 md:flex-none px-6 py-2.5 bg-gradient-to-br from-primary to-primary-container text-on-primary-container text-xs font-bold rounded-xl shadow-lg hover:shadow-primary/20 active:scale-95 transition-all">
+                        Approve
+                    </button>
+<button class="flex-1 md:flex-none px-6 py-2.5 bg-surface-container-highest text-on-surface text-xs font-bold rounded-xl hover:bg-white/5 active:scale-95 transition-all">
+                        Review Details
+                    </button>
+<button class="p-2.5 text-error hover:bg-error/10 rounded-xl transition-all">
+<span class="material-symbols-outlined">block</span>
+</button>
+</div>
+</div>
+<!-- Request Item 2 -->
+<div class="glass-card rounded-2xl p-6 flex flex-col lg:flex-row lg:items-center gap-8 transition-all hover:bg-surface-container-high/50 group">
+<div class="flex items-center gap-4 min-w-[280px]">
+<div class="w-14 h-14 rounded-xl bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img class="object-cover w-full h-full" data-alt="Modern professional male tenant portrait in a sleek charcoal sweater with soft focus architectural backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzhmXE2LShARq2GbJ-r7ysOdxpIR_4ykxWmKSfBZYXaQahV5Ks3NcQCnHTP84M3WB1WryN1u4OdQqbSSTd9BDzG8SbQctMKyUYY7axhPrMVDd4Y86evK_lFUY2AOa7kgUzrKN4yVYEwJIuo-pkZj-SeGGNBMci0r1UfWZmgRqGJkToIrWUuwoffFRvzGIqKNSmFn02yh4Ho6Osbx9egYaAeaFiKgHXhJtNv9yWTghJBxV_9bqfQLenF4PDPbJTSFoseekGKOEVlunE"/>
+</div>
+<div>
+<h3 class="font-headline font-bold text-on-surface">Julian Thorne</h3>
+<p class="text-xs text-zinc-500 font-body">Submitted 4h ago</p>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 flex-1 gap-6">
+<div>
+<span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1 block">Unit Number</span>
+<span class="text-primary font-headline font-bold text-lg tracking-tight">LVL-12/1208</span>
+</div>
+<div>
+<span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1 block">Type</span>
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary/40"></span>
+<span class="text-sm font-body text-on-surface">Lease Tenant</span>
+</div>
+</div>
+<div class="col-span-2 md:col-span-1">
+<span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1 block">Verification Proof</span>
+<button class="flex items-center gap-2 text-xs font-bold py-1 px-3 bg-surface-container-highest rounded hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-sm">assignment_turned_in</span>
+                            LEASE_AGR_1208.PDF
+                        </button>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex-1 md:flex-none px-6 py-2.5 bg-gradient-to-br from-primary to-primary-container text-on-primary-container text-xs font-bold rounded-xl shadow-lg hover:shadow-primary/20 active:scale-95 transition-all">
+                        Approve
+                    </button>
+<button class="flex-1 md:flex-none px-6 py-2.5 bg-surface-container-highest text-on-surface text-xs font-bold rounded-xl hover:bg-white/5 active:scale-95 transition-all">
+                        Review Details
+                    </button>
+<button class="p-2.5 text-error hover:bg-error/10 rounded-xl transition-all">
+<span class="material-symbols-outlined">block</span>
+</button>
+</div>
+</div>
+<!-- Request Item 3 -->
+<div class="glass-card rounded-2xl p-6 flex flex-col lg:flex-row lg:items-center gap-8 transition-all hover:bg-surface-container-high/50 group">
+<div class="flex items-center gap-4 min-w-[280px]">
+<div class="w-14 h-14 rounded-xl bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img class="object-cover w-full h-full" data-alt="Elegant businesswoman portrait with a sharp focused look, dramatic cinematic lighting on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDABxWHz66JLA3AJVtPMeJhX7MsCN8IqM7Pa0sYeCEadsHjdCAlrKQwrzsuIoGFLC-wFzrIp8n6732KuFU2rbF7b2Q9GqGCPVxUAZvMQ7wFGlGk7YtcT7DQVr6A7X02paXCjz_3HzZmSp5P2vGQEo-O_X9_bvqvgi-Fl0Bfd01oIlAm3dOUVOkf7S6wjLP6bD1m9Bxcwbz38VVselTxxVgqKlxgY7iAvv2JtxKt6pmuRsSfemVnYRe3Rf04hWr9-gjJCDAL032CMY36"/>
+</div>
+<div>
+<h3 class="font-headline font-bold text-on-surface">Sarah Sterling</h3>
+<p class="text-xs text-zinc-500 font-body">Submitted 5h ago</p>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 flex-1 gap-6">
+<div>
+<span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1 block">Unit Number</span>
+<span class="text-primary font-headline font-bold text-lg tracking-tight">G-102</span>
+</div>
+<div>
+<span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1 block">Type</span>
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
+<span class="text-sm font-body text-on-surface">Property Owner</span>
+</div>
+</div>
+<div class="col-span-2 md:col-span-1">
+<span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1 block">Verification Proof</span>
+<button class="flex items-center gap-2 text-xs font-bold py-1 px-3 bg-surface-container-highest rounded hover:bg-white/10 transition-colors text-error/80">
+<span class="material-symbols-outlined text-sm">warning</span>
+                            DOC_MISSING.PNG
+                        </button>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex-1 md:flex-none px-6 py-2.5 bg-gradient-to-br from-primary to-primary-container text-on-primary-container text-xs font-bold rounded-xl shadow-lg hover:shadow-primary/20 active:scale-95 transition-all">
+                        Approve
+                    </button>
+<button class="flex-1 md:flex-none px-6 py-2.5 bg-surface-container-highest text-on-surface text-xs font-bold rounded-xl hover:bg-white/5 active:scale-95 transition-all">
+                        Review Details
+                    </button>
+<button class="p-2.5 text-error hover:bg-error/10 rounded-xl transition-all">
+<span class="material-symbols-outlined">block</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Footer Pagination / Actions -->
+<footer class="mt-12 flex flex-col md:flex-row items-center justify-between gap-6 py-8 border-t border-white/5">
+<div class="text-xs text-zinc-500 font-body">
+                Showing <span class="text-on-surface font-bold">1-12</span> of <span class="text-on-surface font-bold">48</span> access requests
+            </div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-lg bg-surface-container-low text-zinc-500 hover:text-on-surface transition-all">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-lg bg-primary/10 text-primary font-bold text-xs">1</button>
+<button class="w-10 h-10 rounded-lg text-zinc-500 font-bold text-xs hover:bg-white/5 transition-all">2</button>
+<button class="w-10 h-10 rounded-lg text-zinc-500 font-bold text-xs hover:bg-white/5 transition-all">3</button>
+<span class="text-zinc-500 px-2">...</span>
+<button class="w-10 h-10 rounded-lg text-zinc-500 font-bold text-xs hover:bg-white/5 transition-all">8</button>
+<button class="p-2 rounded-lg bg-surface-container-low text-zinc-500 hover:text-on-surface transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</footer>
+</main>
+<!-- Modal Fragment (Review Details Simulation) -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-background/80 backdrop-blur-sm pointer-events-none opacity-0 group-[.modal-open]:opacity-100 transition-opacity">
+<div class="w-full max-w-lg glass-card rounded-3xl p-8 shadow-[0px_40px_80px_rgba(0,0,0,0.6)]">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h2 class="text-2xl font-headline font-bold text-on-surface mb-1">Audit Entry: Sarah Sterling</h2>
+<p class="text-xs text-zinc-500 tracking-widest uppercase">Request ID: ARCH-9923</p>
+</div>
+<button class="p-2 text-zinc-500 hover:text-on-surface transition-all">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="space-y-6 mb-8">
+<div class="bg-surface-container p-4 rounded-2xl">
+<span class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest block mb-2">Rejection Reason (Required for Denials)</span>
+<textarea class="w-full bg-surface-container-highest border-none rounded-xl text-sm focus:ring-1 focus:ring-error/40 placeholder:text-zinc-600 h-24" placeholder="Enter reason for rejecting access request..."></textarea>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex-1 py-3 bg-error text-on-error text-sm font-bold rounded-xl hover:bg-error/90 transition-all">Confirm Rejection</button>
+<button class="flex-1 py-3 bg-surface-container-highest text-on-surface text-sm font-bold rounded-xl hover:bg-white/10 transition-all">Cancel</button>
+</div>
+</div>
+</div>
+</body></html>

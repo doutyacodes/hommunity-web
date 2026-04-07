@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Architect Ledger Admin | Security Console</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#4d93e5",
+                        "on-primary-fixed-variant": "#004883",
+                        "error-container": "#93000a",
+                        "outline-variant": "#414751",
+                        "surface-tint": "#a4c9ff",
+                        "surface-container": "#201f1f",
+                        "on-primary-fixed": "#001c39",
+                        "secondary-fixed-dim": "#3ce36a",
+                        "on-background": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "background": "#131313",
+                        "surface-bright": "#393939",
+                        "on-tertiary": "#313030",
+                        "outline": "#8b919d",
+                        "on-secondary": "#003912",
+                        "primary-fixed-dim": "#a4c9ff",
+                        "on-surface": "#e5e2e1",
+                        "surface-container-highest": "#353534",
+                        "tertiary": "#c8c6c5",
+                        "inverse-primary": "#0060ac",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-error": "#690005",
+                        "surface-container-low": "#1c1b1b",
+                        "on-error-container": "#ffdad6",
+                        "on-surface-variant": "#c1c7d3",
+                        "on-primary-container": "#002a51",
+                        "surface-dim": "#131313",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "primary-fixed": "#d4e3ff",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-container": "#2a2a29",
+                        "surface-variant": "#353534",
+                        "primary": "#a4c9ff",
+                        "on-secondary-fixed": "#002108",
+                        "secondary": "#40e56c",
+                        "secondary-fixed": "#69ff87",
+                        "on-secondary-container": "#004d1b",
+                        "surface": "#131313",
+                        "on-tertiary-fixed-variant": "#474646",
+                        "inverse-on-surface": "#313030",
+                        "tertiary-container": "#929090",
+                        "on-primary": "#00315d",
+                        "tertiary-fixed": "#e5e2e1",
+                        "secondary-container": "#02c953",
+                        "on-secondary-fixed-variant": "#00531e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(53, 53, 52, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .security-pulse {
+            position: relative;
+        }
+        .security-pulse::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #40e56c;
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 z-50 w-full h-16 flex items-center justify-between px-6 bg-[#1c1c1c] shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#a4c9ff] font-headline uppercase">Architect Ledger Admin</span>
+<div class="hidden md:flex items-center bg-surface-container-highest px-4 py-1.5 rounded-lg">
+<span class="material-symbols-outlined text-outline text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm text-on-surface-variant w-64 font-body" placeholder="Global system search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-zinc-500 hover:bg-white/5 transition-colors rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="p-2 text-zinc-500 hover:bg-white/5 transition-colors rounded-full">
+<span class="material-symbols-outlined">shield_lock</span>
+</button>
+<button class="p-2 text-zinc-500 hover:bg-white/5 transition-colors rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden ml-2 ring-1 ring-outline-variant">
+<img alt="Administrator profile" data-alt="Close-up professional headshot of a male security administrator in a dark uniform with clean lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIXzSxo78ntol_5MH-_xlfLWCP6oVcedFWq77irPVPqEgb-HRwcJYYLh6vypBcnaxqMobiMR_tRtHnjf4EzD4ToWQJUvrF0ip-Z_cbmawVsvWjBhwz3XobgHmZlHdh_davg_IdfbTrUtGpSI9vTrSfueVyB4D2yvbFKe4RMTWeNuKEtXpDq8Zx-KeEGbPD4yzQTnUpFgCiakaazMLyR_5Yv6NCklUYwNzvzQ3D6ex6T8z71hCDFrnxw51dFB1azO-RQgkIW-Nto3m0"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar Shell -->
+<nav class="h-screen w-64 fixed left-0 top-0 bg-[#131313] flex flex-col py-8 px-4 z-40">
+<div class="mb-10 px-4 mt-16">
+<h2 class="text-[#a4c9ff] uppercase tracking-widest text-xs font-headline font-extrabold mb-1">Building Console</h2>
+<p class="text-zinc-500 text-[10px] uppercase font-bold tracking-tight">High-Security Zone</p>
+</div>
+<div class="space-y-1 flex-1">
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-all duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-['Inter'] font-medium text-sm">Structure</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#a4c9ff]/10 to-transparent text-[#a4c9ff] border-r-2 border-[#a4c9ff] transition-all duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">security_update_good</span>
+<span class="font-['Inter'] font-medium text-sm">Security</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-all duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined">approval_delegation</span>
+<span class="font-['Inter'] font-medium text-sm">Requests</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-all duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-['Inter'] font-medium text-sm">Governance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-all duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-['Inter'] font-medium text-sm">Analytics</span>
+</a>
+</div>
+<div class="mt-auto space-y-1 pt-6 border-t border-white/5">
+<a class="flex items-center gap-3 px-4 py-2 text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined text-lg">help</span>
+<span class="font-['Inter'] font-medium text-xs">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined text-lg">history</span>
+<span class="font-['Inter'] font-medium text-xs">Logs</span>
+</a>
+<div class="mt-4 px-4">
+<div class="bg-secondary/10 px-3 py-2 rounded-lg flex items-center gap-2">
+<div class="w-1.5 h-1.5 bg-secondary rounded-full security-pulse"></div>
+<span class="text-[10px] text-secondary font-bold uppercase tracking-wider">System Status: Live</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 pb-12 px-8 min-h-screen">
+<!-- Header Section with Intentional Asymmetry -->
+<section class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="max-w-2xl">
+<h1 class="text-5xl font-extrabold font-headline tracking-tighter text-on-surface mb-2">Gate &amp; Security Controls</h1>
+<p class="text-on-surface-variant font-body text-lg max-w-xl">
+                    Configure perimeter access points, manage tactical deployments, and audit real-time personnel shifts across the Ledger.
+                </p>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold px-6 py-3 rounded-xl flex items-center gap-2 shadow-[0px_4px_20px_rgba(164,201,255,0.3)] hover:scale-[1.02] active:scale-95 transition-transform">
+<span class="material-symbols-outlined">add_moderator</span>
+                Initialize New Gate
+            </button>
+</section>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Active Gates Module (Large Bento Piece) -->
+<div class="col-span-12 lg:col-span-8 space-y-6">
+<div class="bg-surface-container-low rounded-xl p-6">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold font-headline text-primary">Perimeter Access Nodes</h3>
+<span class="text-xs font-bold text-outline uppercase tracking-widest">4 Active Terminals</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Gate Card 1 -->
+<div class="bg-surface-container-high rounded-xl p-5 border-l-4 border-secondary">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-headline font-bold text-lg text-on-surface">North Gate</h4>
+<p class="text-xs text-on-surface-variant font-medium">Primary Freight Entrance</p>
+</div>
+<span class="bg-secondary/10 text-secondary px-2 py-1 rounded text-[10px] font-bold uppercase">Secured</span>
+</div>
+<div class="flex items-center gap-4 py-4 bg-surface-container-highest/30 rounded-lg px-4 mb-4">
+<div class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<div>
+<p class="text-[10px] text-outline uppercase font-bold">Duty Officer</p>
+<p class="text-sm font-semibold text-on-surface">Cmdr. Elias Thorne</p>
+</div>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Shift: 06:00 - 14:00</span>
+<button class="text-primary font-bold hover:underline">Reassign</button>
+</div>
+</div>
+<!-- Gate Card 2 -->
+<div class="bg-surface-container-high rounded-xl p-5 border-l-4 border-primary">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-headline font-bold text-lg text-on-surface">Service Entrance</h4>
+<p class="text-xs text-on-surface-variant font-medium">Logistics &amp; Maintenance</p>
+</div>
+<span class="bg-primary/10 text-primary px-2 py-1 rounded text-[10px] font-bold uppercase">Active</span>
+</div>
+<div class="flex items-center gap-4 py-4 bg-surface-container-highest/30 rounded-lg px-4 mb-4">
+<div class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center overflow-hidden">
+<img alt="Duty Officer" data-alt="Portrait of a young woman in security uniform, focused and professional expression with neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOXarbGAYjxTLFhyc2kOchnpTpbZCvmNGaDD6rBerV-SYNorzos1RGlU9ZDB2N6qzWaFtPFc7kU6ZPcwSmvsE4HovwjVDevvFEMJVhZP2uJkdDirl06B2t7wl_2BMkyDrhM4roQgRlZr_F5_LO8KNGriM3wXmwSmxiSJ20eWwXHTpKfW3gLeJcHboRhTHvFGNiDqnpWwnSVDqrCCK5WhTxG2Iwsm--SIOdhBGl7XW0OnDJJA0TRHVjkUGbXMeFv0C3JBUd72PKcAtd"/>
+</div>
+<div>
+<p class="text-[10px] text-outline uppercase font-bold">Duty Officer</p>
+<p class="text-sm font-semibold text-on-surface">Sgt. Sarah Chen</p>
+</div>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Shift: 14:00 - 22:00</span>
+<button class="text-primary font-bold hover:underline">Reassign</button>
+</div>
+</div>
+<!-- Gate Card 3 -->
+<div class="bg-surface-container-high rounded-xl p-5 border-l-4 border-secondary">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-headline font-bold text-lg text-on-surface">West Pedestrian</h4>
+<p class="text-xs text-on-surface-variant font-medium">Citizen Ingress</p>
+</div>
+<span class="bg-secondary/10 text-secondary px-2 py-1 rounded text-[10px] font-bold uppercase">Secured</span>
+</div>
+<div class="flex items-center gap-4 py-4 bg-surface-container-highest/30 rounded-lg px-4 mb-4">
+<div class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<div>
+<p class="text-[10px] text-outline uppercase font-bold">Duty Officer</p>
+<p class="text-sm font-semibold text-on-surface">Ofc. Marcus Vane</p>
+</div>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Shift: 06:00 - 14:00</span>
+<button class="text-primary font-bold hover:underline">Reassign</button>
+</div>
+</div>
+<!-- Gate Card 4 (Add Gate Placeholder) -->
+<div class="bg-surface-container-low border-2 border-dashed border-outline-variant rounded-xl p-5 flex flex-col items-center justify-center hover:bg-white/5 transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-4xl mb-2">add_circle</span>
+<p class="font-bold text-outline text-sm uppercase tracking-wider">Expand Perimeter</p>
+</div>
+</div>
+</div>
+<!-- Shift Rosters (Horizontal List) -->
+<div class="bg-surface-container-low rounded-xl p-6">
+<h3 class="text-xl font-bold font-headline text-primary mb-6">Tactical Shift Rotations</h3>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-lg">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-primary-container/20 rounded-lg">
+<span class="material-symbols-outlined text-primary">wb_sunny</span>
+</div>
+<div>
+<h5 class="font-bold text-on-surface">Morning Shift</h5>
+<p class="text-xs text-on-surface-variant">Personnel Cap: 12 Units</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-bold text-primary tracking-tight">06:00 — 14:00</p>
+<span class="text-[10px] text-secondary font-bold uppercase">Fully Staffed</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-lg">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-secondary-container/20 rounded-lg">
+<span class="material-symbols-outlined text-secondary">wb_twilight</span>
+</div>
+<div>
+<h5 class="font-bold text-on-surface">Afternoon Shift</h5>
+<p class="text-xs text-on-surface-variant">Personnel Cap: 8 Units</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-bold text-primary tracking-tight">14:00 — 22:00</p>
+<span class="text-[10px] text-error font-bold uppercase">2 Slots Open</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-lg">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-outline-variant/20 rounded-lg">
+<span class="material-symbols-outlined text-outline">dark_mode</span>
+</div>
+<div>
+<h5 class="font-bold text-on-surface">Night Watch</h5>
+<p class="text-xs text-on-surface-variant">Personnel Cap: 6 Units</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-bold text-primary tracking-tight">22:00 — 06:00</p>
+<span class="text-[10px] text-secondary font-bold uppercase">Fully Staffed</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Personnel Roster (Side Bento Piece) -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<div class="bg-surface-container-low rounded-xl p-6 h-full flex flex-col">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-xl font-bold font-headline text-on-surface">Registry</h3>
+<button class="text-xs font-bold text-primary uppercase hover:bg-primary/10 px-2 py-1 rounded transition-colors">View All</button>
+</div>
+<!-- Personnel Search -->
+<div class="mb-6">
+<div class="relative">
+<input class="w-full bg-surface-container-highest border-none rounded-lg py-3 pl-10 text-sm focus:ring-1 focus:ring-primary/40" placeholder="Find personnel..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+</div>
+</div>
+<!-- Scrollable Personnel List -->
+<div class="flex-1 space-y-4 overflow-y-auto max-h-[600px] pr-2">
+<!-- Personnel Item 1 -->
+<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Personnel" class="w-10 h-10 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Portrait of a middle-aged security specialist with a focused, authoritative gaze in a dark grey uniform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCS2EoUH59kiTuUieXruDv71l27LOFhH3nd3z4CyQds3BYa3PVwMK-GKZKmDpAGLFFlVKLtQvo9g15OPPPksgUQB-ogoTcrNFQPWZjLCuVWqMTAo2HRuU5wraqLUNRhIthB275PpN-dkQEt0qi7VAvBgJSYRCC1pTwybp-YycNtRBvkNTG1zi5OTmDBbRtX-ijR8Z8FO8WErMR_VYiDZVw8-n-zQ8--w8hPc0HbeIqIcst4-LsXpOblxbKGi2WIESFHENND-H3h-nag"/>
+<div class="absolute -bottom-1 -right-1 w-3 h-3 bg-secondary border-2 border-surface-container-low rounded-full"></div>
+</div>
+<div>
+<h6 class="font-bold text-sm text-on-surface">Sgt. James Miller</h6>
+<p class="text-[10px] text-on-surface-variant font-medium uppercase tracking-tighter">Tactical Response</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-sm opacity-0 group-hover:opacity-100 transition-opacity">more_vert</span>
+</div>
+<!-- Personnel Item 2 -->
+<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer border-l-2 border-primary/40 bg-primary/5">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Personnel" class="w-10 h-10 rounded-full object-cover" data-alt="Headshot of a focused professional security officer with short dark hair, wearing a high-tech communication headset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0sb8lGEtlKdcK0c7VW76FoPacEdMYPxVoEmOdIC6kaQ8VOtOV6mcPz6s0dqp9sW_JacKkcxRTRDMK_ugvKQKZeqRyCNLyKBLipBE5YJVJnlhvxVkHATOok6ly3IcezXYxBUN-_YTLGbVL2bs6WmDUcY4QU8vlkJCFaTqTAe-TWojgp3xsLg8EgboeEsYFAs99kdI6pFysdtyBw4A1aSAd_n7wkdTkwqfWC1JtYgC6prUD5eLDhOsBVrIN2UjPnLPTey106mmahhQC"/>
+<div class="absolute -bottom-1 -right-1 w-3 h-3 bg-secondary border-2 border-surface-container-low rounded-full"></div>
+</div>
+<div>
+<h6 class="font-bold text-sm text-on-surface">Ofc. Elena Rossi</h6>
+<p class="text-[10px] text-primary font-bold uppercase tracking-tighter">Assigned: North Gate</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary text-sm">link</span>
+</div>
+<!-- Personnel Item 3 -->
+<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Personnel" class="w-10 h-10 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Portrait of an experienced security veteran with salt-and-pepper beard, wearing a tactical security cap" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHdi3QbjK0tYrxN5fDm1MF9omiI9hmcWd7Qs0KNrABiIMhYUx4ZLdJzgiayzHV8lPTzVBd6nNBEf3X6wF2kdp630U2-J24AJT0XkQDbhsPnaW51Tg5ND-Oge9eFgaO6EdPiSRwdHODdw2Aka-1AgFlomYkvX1-DnQwqy6se644UORg2rZ0BSZfpQkJ3NXVExPbD1q_tdBU2HV_csRCSuxrk5N21Lacfq2Ehc8AfML1W3dyVjzQgizio4Kz5MZchpoGh6KoyyBU1eDM"/>
+<div class="absolute -bottom-1 -right-1 w-3 h-3 bg-outline border-2 border-surface-container-low rounded-full"></div>
+</div>
+<div>
+<h6 class="font-bold text-sm text-on-surface">Cpt. David Wu</h6>
+<p class="text-[10px] text-on-surface-variant font-medium uppercase tracking-tighter text-outline">Off-Duty</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-sm opacity-0 group-hover:opacity-100 transition-opacity">more_vert</span>
+</div>
+<!-- Personnel Item 4 -->
+<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Personnel" class="w-10 h-10 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Close up portrait of a serious young woman with braided hair in a dark utility uniform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWSGM1FD6pTK3gwzLR-q_M-raQPZf_To0PfEot3b4udZLqX7SUvdeBc_sygW3_OJkqyIuXOLQPhPOlTqyyDGNXHB2C69JP3oc1acTlHWxeAvQg0a4dz02XXRa-9PJDDS30PYzfEY36bprWbEWCC7R0YP6GNEcADrfPc2td7bZG-XUBedZviOHyUBOKuPtp4yszocxqzcOpFXpb81l2QgJZ76odV1EXedO7fky7lxKALNZGqow4osSo_1CB1Floceh_ArzVuiF4g3Ju"/>
+<div class="absolute -bottom-1 -right-1 w-3 h-3 bg-secondary border-2 border-surface-container-low rounded-full"></div>
+</div>
+<div>
+<h6 class="font-bold text-sm text-on-surface">Ofc. Maya Kotto</h6>
+<p class="text-[10px] text-on-surface-variant font-medium uppercase tracking-tighter">Perimeter Patrol</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-sm opacity-0 group-hover:opacity-100 transition-opacity">more_vert</span>
+</div>
+<!-- Personnel Item 5 -->
+<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Personnel" class="w-10 h-10 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Corporate security manager in a sharp dark suit with a modern architectural office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBL2p9WZgh-peTyzlpiR5mdZXtyf6INmGvgPt1HBEfMeMqaqYTA0HXAzLe98li6VfPToQL0Fj6I33zWQIFEnUdmukP-F8M8I5PE0X9xCfwgzBkzJC6EKjx2K32GFGeWitORaFn-iyh2dwhtyc0c11w8C5A2-LKryodVXEQo7IF1SYKDQqdlx4vIrj1MPvvCKJX2CeMHdL5HLCY9LePro3yGTocaHEfCOZZ_BsCcndrIF2N7u6CPDsbMaL9_osCCi3jBcGw1IvC6WOhW"/>
+<div class="absolute -bottom-1 -right-1 w-3 h-3 bg-secondary border-2 border-surface-container-low rounded-full"></div>
+</div>
+<div>
+<h6 class="font-bold text-sm text-on-surface">Cmdr. Elias Thorne</h6>
+<p class="text-[10px] text-primary font-bold uppercase tracking-tighter">Assigned: North Gate</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary text-sm">link</span>
+</div>
+</div>
+<button class="mt-6 w-full py-4 border-t border-outline-variant text-sm font-bold text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">person_add</span>
+                        Onboard New Specialist
+                    </button>
+</div>
+</div>
+<!-- Audit Trail (Full Width Bento Piece) -->
+<div class="col-span-12">
+<div class="bg-surface-container-low rounded-xl p-6">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold font-headline text-on-surface">Security Audit Log</h3>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-xs font-bold text-outline-variant uppercase">
+<span class="w-2 h-2 bg-secondary rounded-full"></span>
+                                Clearance Level 4
+                            </div>
+<button class="bg-surface-container-highest p-2 rounded-lg text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-[10px] uppercase tracking-widest text-outline border-b border-outline-variant/30">
+<th class="pb-4 pl-4">Timestamp</th>
+<th class="pb-4">Actor</th>
+<th class="pb-4">Location</th>
+<th class="pb-4">Action Event</th>
+<th class="pb-4 pr-4 text-right">Integrity</th>
+</tr>
+</thead>
+<tbody class="text-sm font-medium">
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="py-4 pl-4 text-outline">09:42:12</td>
+<td class="py-4">Sgt. Sarah Chen</td>
+<td class="py-4">Service Entrance</td>
+<td class="py-4">Shift hand-over complete. Bio-metric lock engaged.</td>
+<td class="py-4 pr-4 text-right"><span class="text-secondary">Verified</span></td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="py-4 pl-4 text-outline">08:15:05</td>
+<td class="py-4">System Console</td>
+<td class="py-4">Global Perimeter</td>
+<td class="py-4">Scheduled security protocols updated for Night Watch.</td>
+<td class="py-4 pr-4 text-right"><span class="text-secondary">Verified</span></td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="py-4 pl-4 text-outline">07:58:33</td>
+<td class="py-4">Cmdr. Elias Thorne</td>
+<td class="py-4">North Gate</td>
+<td class="py-4 text-error">Access denied: Authorization Token 45-X expired.</td>
+<td class="py-4 pr-4 text-right"><span class="text-error-container bg-error-container/10 px-2 py-0.5 rounded">Flagged</span></td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="py-4 pl-4 text-outline">06:00:00</td>
+<td class="py-4">Ofc. Marcus Vane</td>
+<td class="py-4">West Pedestrian</td>
+<td class="py-4">Station online. Visual sensors calibrated.</td>
+<td class="py-4 pr-4 text-right"><span class="text-secondary">Verified</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
