@@ -5,8 +5,23 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const poolConnection = mysql.createPool({
-  uri: process.env.DATABASE_URL!,
-});
+const connectionUri = process.env.DATABASE_URL!;
 
-export const db = drizzle(poolConnection, { schema, mode: "default" });
+// Use global to store the connection to prevent multiple connections in dev
+const globalForDb = global as unknown as { 
+  db: any;
+  pool: mysql.Pool | undefined;
+};
+
+if (!globalForDb.pool) {
+  globalForDb.pool = mysql.createPool({
+    uri: connectionUri,
+    connectionLimit: 10,
+  });
+}
+
+export const db = globalForDb.db ?? drizzle(globalForDb.pool, { schema, mode: "default" });
+
+if (process.env.NODE_ENV !== "production") {
+  globalForDb.db = db;
+}

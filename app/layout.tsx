@@ -18,9 +18,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full dark antialiased", inter.variable, manrope.variable, geistMono.variable)}
+      className={cn("h-full antialiased", inter.variable, manrope.variable, geistMono.variable)}
     >
-      <body className="min-h-full flex flex-col bg-[#131313] text-[#e5e2e1]">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"

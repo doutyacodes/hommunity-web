@@ -1,69 +1,83 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail, Shield, Info } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, Shield, Info, ArrowRight } from "lucide-react";
+import { loginAdmin } from "@/lib/actions/auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [role, setRole] = useState<"super" | "admin">("super");
   const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      router.push("/buildings");
-    }, 1200);
+    const formData = new FormData(e.currentTarget);
+    setErrorMsg("");
+
+    startTransition(async () => {
+      const result = await loginAdmin(null, formData);
+      if (result.error) {
+        setErrorMsg(result.error);
+      } else if (result.success) {
+        if (result.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/superadmin/buildings");
+        }
+      }
+    });
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 blueprint-bg overflow-hidden relative">
-      {/* Background orbs */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#a4c9ff]/8 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[#40e56c]/5 blur-[120px]" />
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6 relative overflow-hidden">
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 pointer-events-none opacity-40"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.2) 1px, transparent 1px)
+          `,
+          backgroundSize: "40px 40px",
+        }}
+      />
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-400/20 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-green-400/20 blur-[120px] pointer-events-none" />
 
       {/* Login Container */}
-      <main className="w-full max-w-[480px] z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-        {/* Brand header */}
-        <header className="mb-10 text-center">
-          <div className="inline-flex items-center gap-3 mb-2">
-            <span
-              className="material-symbols-outlined text-4xl text-[#a4c9ff]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              domain
-            </span>
-            <h1
-              className="text-3xl font-black tracking-tighter text-[#a4c9ff] font-headline"
-            >
+      <main className="w-full max-w-md z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        
+        {/* Glass card */}
+        <div className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-xl border border-slate-200">
+          {/* Brand header */}
+          <div className="mb-10 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 shadow-sm mb-4">
+              <span
+                className="material-symbols-outlined text-4xl text-blue-600"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                domain
+              </span>
+            </div>
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 font-headline mb-1">
               Hommunity
             </h1>
-          </div>
-          <p
-            className="text-[#8b919d] text-[10px] font-bold uppercase tracking-[0.25em] font-headline"
-          >
-            Architectural Ledger
-          </p>
-        </header>
-
-        {/* Glass card */}
-        <div className="glass-panel p-8 md:p-10 rounded-2xl shadow-[0px_20px_40px_rgba(0,0,0,0.5)] border border-white/8">
-          <div className="mb-8">
-            <h2
-              className="text-2xl font-bold text-[#e5e2e1] mb-1 font-headline"
-            >
-              Admin Portal
-            </h2>
-            <p className="text-[#8b919d] text-sm">Secure access to the community management ledger.</p>
+            <p className="text-slate-500 text-sm font-medium">
+              Architectural Ledger Portal
+            </p>
           </div>
 
           <form className="space-y-6" onSubmit={handleLogin}>
+            {errorMsg && (
+              <div className="p-3 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-bold text-center">
+                {errorMsg}
+              </div>
+            )}
+
             {/* Role segmented control */}
-            <div className="p-1 bg-[#0e0e0e] rounded-xl flex gap-1">
+            <div className="p-1 bg-slate-100 rounded-xl flex gap-1 border border-slate-200 shadow-inner">
               {(["super", "admin"] as const).map((r) => (
                 <button
                   key={r}
@@ -71,32 +85,30 @@ export default function LoginPage() {
                   onClick={() => setRole(r)}
                   className={[
                     "flex-1 py-2.5 px-4 text-xs font-bold rounded-lg transition-all duration-300",
-                    "uppercase tracking-wider",
+                    "uppercase tracking-wider font-headline",
                     role === r
-                      ? "bg-[#353534] text-[#a4c9ff] shadow-lg"
-                      : "text-[#8b919d] hover:text-[#c1c7d3]",
-                  + " font-headline"
+                      ? "bg-white text-blue-700 shadow border border-slate-200/50"
+                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50",
                   ].join(" ")}
                 >
-                  {r === "super" ? "Super Admin" : "Admin"}
+                  {r === "super" ? "Super Admin" : "Local Admin"}
                 </button>
               ))}
             </div>
 
             {/* Email */}
             <div className="space-y-2">
-              <label
-                className="text-[10px] font-bold text-[#8b919d] uppercase tracking-wider font-headline"
-              >
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                 Access Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8b919d] w-4 h-4" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                 <input
                   type="email"
+                  name="email"
                   placeholder="admin@hommunity.sys"
-                  defaultValue={role === "super" ? "superadmin@hommunity.sys" : "admin@hommunity.sys"}
-                  className="w-full bg-[#353534] border-0 rounded-xl py-4 pl-12 pr-4 text-[#e5e2e1] placeholder:text-[#8b919d]/50 focus:ring-2 focus:ring-[#a4c9ff]/40 transition-all outline-none text-sm"
+                  defaultValue={role === "super" ? "superadmin@hommunity.com" : "admin@hommunity.com"}
+                  className="w-full bg-white border border-slate-200 shadow-sm rounded-xl py-3.5 pl-11 pr-4 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-sm"
                 />
               </div>
             </div>
@@ -104,30 +116,29 @@ export default function LoginPage() {
             {/* Password */}
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <label
-                  className="text-[10px] font-bold text-[#8b919d] uppercase tracking-wider font-headline"
-                >
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                   Security Key
                 </label>
                 <button
                   type="button"
-                  className="text-[10px] font-bold text-[#a4c9ff] uppercase tracking-wider hover:underline underline-offset-4"
+                  className="text-[10px] font-bold text-blue-600 uppercase tracking-wider hover:underline underline-offset-4"
                 >
-                  Reset Credentials
+                  Reset Key
                 </button>
               </div>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8b919d] w-4 h-4" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                 <input
                   type={showPass ? "text" : "password"}
+                  name="password"
                   placeholder="••••••••••••"
-                  defaultValue="••••••••••••"
-                  className="w-full bg-[#353534] border-0 rounded-xl py-4 pl-12 pr-12 text-[#e5e2e1] placeholder:text-[#8b919d]/50 focus:ring-2 focus:ring-[#a4c9ff]/40 transition-all outline-none text-sm"
+                  defaultValue="Apple@123"
+                  className="w-full bg-white border border-slate-200 shadow-sm rounded-xl py-3.5 pl-11 pr-11 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8b919d] hover:text-[#e5e2e1] transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -137,61 +148,48 @@ export default function LoginPage() {
             {/* Submit */}
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-4 px-6 rounded-xl bg-gradient-to-br from-[#a4c9ff] to-[#4d93e5] text-[#00315d] font-black text-sm uppercase tracking-widest shadow-[0_10px_20px_-5px_rgba(164,201,255,0.3)] hover:shadow-[0_15px_30px_-5px_rgba(164,201,255,0.4)] active:scale-[0.98] transition-all duration-300 disabled:opacity-70 font-headline"
+              disabled={isPending}
+              className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 disabled:opacity-70 disabled:hover:translate-y-0 font-headline tracking-wide"
             >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-[#00315d]/40 border-t-[#00315d] rounded-full animate-spin" />
+              {isPending ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                   Authorizing...
-                </span>
+                </>
               ) : (
-                "Authorize Access"
+                <>
+                  Authorize Session
+                  <ArrowRight size={16} />
+                </>
               )}
             </button>
           </form>
 
-          {/* Footer */}
-          <div className="mt-8 pt-6 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#40e56c] security-pulse shrink-0" />
-              <span
-                className="text-[10px] font-bold text-[#8b919d] uppercase tracking-widest font-headline"
-              >
-                System Online
+          {/* Footer Status */}
+          <div className="mt-8 pt-6 border-t border-slate-200/60 flex items-center justify-between">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse border border-green-200" />
+              <span className="text-[9px] font-bold text-green-700 uppercase tracking-widest">
+                Network Secure
               </span>
             </div>
-            <div className="flex gap-3">
-              <Shield className="w-4 h-4 text-[#8b919d] hover:text-[#a4c9ff] cursor-pointer transition-colors" />
-              <Info className="w-4 h-4 text-[#8b919d] hover:text-[#a4c9ff] cursor-pointer transition-colors" />
+            <div className="flex gap-2">
+              <div className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer transition-colors shadow-sm">
+                <Shield className="w-4 h-4" />
+              </div>
+              <div className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer transition-colors shadow-sm">
+                <Info className="w-4 h-4" />
+              </div>
             </div>
           </div>
         </div>
 
         <footer className="mt-8 text-center">
-          <p
-            className="text-[10px] font-medium text-[#414751] uppercase tracking-[0.2em] font-headline"
-          >
-            © 2025 Hommunity Systems • Proprietary Management Software
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            © 2026 Hommunity Systems • Proprietary Software
           </p>
         </footer>
       </main>
-
-      {/* Side architectural graphic */}
-      <div className="hidden lg:flex fixed right-0 top-0 bottom-0 w-1/3 p-12 select-none opacity-[0.08] hover:opacity-[0.14] transition-opacity duration-700 flex-col justify-end">
-        <div className="border-l border-[#a4c9ff]/30 h-full flex flex-col justify-end pl-8">
-          <div className="space-y-4 mb-12">
-            {[100, 75, 50, 30].map((w, i) => (
-              <div key={i} className="h-0.5 bg-gradient-to-r from-[#a4c9ff]/60 to-transparent" style={{ width: `${w}%` }} />
-            ))}
-          </div>
-          <p
-            className="font-black text-7xl text-[#e5e2e1]/5 leading-none font-headline"
-          >
-            STRUCTURAL<br />INTEGRITY
-          </p>
-        </div>
-      </div>
     </div>
   );
 }

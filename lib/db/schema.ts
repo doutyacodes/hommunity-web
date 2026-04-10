@@ -34,6 +34,7 @@ export const guards = mysqlTable('guards', {
   phone: varchar('phone', { length: 20 }).notNull().unique(),
   email: varchar('email', { length: 255 }),
   passwordHash: varchar('password_hash', { length: 255 }),
+  buildingId: varchar('building_id', { length: 36 }).references(() => buildings.id),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
 });
@@ -47,6 +48,7 @@ export const buildings = mysqlTable('buildings', {
   latitude: decimal('latitude', { precision: 10, scale: 8 }),
   longitude: decimal('longitude', { precision: 11, scale: 8 }),
   imageUrl: text('image_url'),
+  status: mysqlEnum('status', ['ACTIVE', 'DISABLED']).default('ACTIVE').notNull(),
   metadata: json('metadata'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -85,6 +87,7 @@ export const apartmentResidents = mysqlTable('apartment_residents', {
   apartmentId: varchar('apartment_id', { length: 36 }).notNull().references(() => apartments.id),
   type: mysqlEnum('type', ['OWNER', 'TENANT']).notNull(),
   status: mysqlEnum('status', ['PENDING_APPROVAL', 'APPROVED', 'REJECTED', 'INACTIVE_PAST']).notNull().default('PENDING_APPROVAL'),
+  documents: json('documents').$type<string[]>(), // Added for IDs and Leases
   canApproveVisitors: boolean('can_approve_visitors').default(true).notNull(), // Privileges!
   startDate: datetime('start_date'),
   endDate: datetime('end_date'),
@@ -102,8 +105,9 @@ export const securityShifts = mysqlTable('security_shifts', {
   id: varchar('id', { length: 36 }).primaryKey().$defaultFn(() => randomUUID()),
   guardId: varchar('guard_id', { length: 36 }).notNull().references(() => guards.id),
   gateId: varchar('gate_id', { length: 36 }).notNull().references(() => gates.id),
-  shiftStart: datetime('shift_start').notNull(),
-  shiftEnd: datetime('shift_end').notNull(),
+  days: varchar('days', { length: 255 }).notNull(), // Comma-separated: "MON,TUE..."
+  startTime: varchar('start_time', { length: 10 }).notNull(), // HH:mm
+  endTime: varchar('end_time', { length: 10 }).notNull(), // HH:mm
 });
 
 export const securityAlerts = mysqlTable('security_alerts', {
@@ -210,6 +214,7 @@ export const civicComplaints = mysqlTable('civic_complaints', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// --- PAYMENTS ---
 export const payments = mysqlTable('payments', {
   id: varchar('id', { length: 36 }).primaryKey().$defaultFn(() => randomUUID()),
   apartmentId: varchar('apartment_id', { length: 36 }).notNull().references(() => apartments.id),
@@ -219,4 +224,14 @@ export const payments = mysqlTable('payments', {
   internalRef: varchar('internal_ref', { length: 100 }),
   dueDate: datetime('due_date'),
   paidDate: datetime('paid_date'),
+});
+
+// --- GLOBAL SECURITY RULES ---
+export const globalRules = mysqlTable('global_rules', {
+  id: varchar('id', { length: 36 }).primaryKey().$defaultFn(() => randomUUID()),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description').notNull(),
+  status: mysqlEnum('status', ['ACTIVE', 'DISABLED']).default('ACTIVE').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
 });
