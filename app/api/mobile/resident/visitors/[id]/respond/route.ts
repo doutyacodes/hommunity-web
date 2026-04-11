@@ -7,16 +7,16 @@ import admin from 'firebase-admin';
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: visitorId } = await params;
     const authHeader = req.headers.get("authorization");
     const session = await decrypt(authHeader?.split(" ")[1]);
     
     if (!session || session.role !== "RESIDENT") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { status } = await req.json(); // "INSIDE" (Approved) or "DENIED"
-    const visitorId = params.id;
     const residentId = session.userId as string;
 
     if (!['INSIDE', 'DENIED'].includes(status)) {
