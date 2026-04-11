@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { 
   Users, Search, Filter, CheckCircle2, XCircle, 
   MoreVertical, Trash2, UserPlus, Mail, Phone, Home,
-  Clock, Check, X, AlertCircle
+  Clock, Check, X, AlertCircle, Eye, Loader2, Car, Cat, ShieldCheck, MapPin
 } from "lucide-react";
 import { updateResidentStatusAction, deleteResidentLinkAction } from "@/lib/actions/residents";
 import { useRouter } from "next/navigation";
@@ -20,6 +20,25 @@ export default function ResidentsClient({ initialData, buildingId }: ResidentsCl
   const [filter, setFilter] = useState<"ALL" | "PENDING_APPROVAL" | "APPROVED" | "REJECTED">("ALL");
   const [isPending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [viewingId, setViewingId] = useState<string | null>(null);
+  const [detailsData, setDetailsData] = useState<any>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+
+  const fetchDetails = async (id: string) => {
+    setLoadingDetails(true);
+    setViewingId(id);
+    try {
+      const res = await fetch(`/api/admin/residents/${id}`);
+      const data = await res.json();
+      if (data.success) {
+        setDetailsData(data.data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
 
   const filteredData = initialData.filter(resident => {
     const matchesSearch = resident.residentName.toLowerCase().includes(search.toLowerCase()) || 
@@ -163,6 +182,13 @@ export default function ResidentsClient({ initialData, buildingId }: ResidentsCl
                   </td>
                   <td className="py-6 px-8 text-right">
                     <div className="flex items-center justify-end gap-2">
+                       <button 
+                        onClick={() => fetchDetails(res.id)}
+                        className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm shadow-indigo-100 active:scale-90"
+                        title="View Full Profile"
+                      >
+                        <Eye size={18} />
+                      </button>
                       {res.status === "PENDING_APPROVAL" ? (
                         <>
                           <button 
@@ -206,6 +232,154 @@ export default function ResidentsClient({ initialData, buildingId }: ResidentsCl
           </table>
         </div>
       </div>
+
+      {/* Resident Details Modal */}
+      {viewingId && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[110] flex items-center justify-end animate-in fade-in duration-300">
+          <div className="bg-white h-full w-full max-w-2xl shadow-2xl flex flex-col animate-in slide-in-from-right duration-500 overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl font-black shadow-lg shadow-indigo-100 uppercase">
+                  {detailsData?.resident?.name?.charAt(0) || <Loader2 className="animate-spin" />}
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 font-headline leading-tight">
+                    {detailsData?.resident?.name || "Loading Profile..."}
+                  </h3>
+                  <p className="text-slate-500 text-sm flex items-center gap-2">
+                    <MapPin size={14} className="text-slate-300" /> Linked Resident Profile
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => { setViewingId(null); setDetailsData(null); }}
+                className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-slate-600 transition-all active:scale-90"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+              {loadingDetails ? (
+                <div className="h-64 flex flex-col items-center justify-center gap-4">
+                  <Loader2 className="animate-spin text-indigo-600" size={32} />
+                  <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Compiling Full Profile...</p>
+                </div>
+              ) : detailsData && (
+                <>
+                  {/* Stats Overview */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100/50">
+                      <Users size={20} className="text-indigo-600 mb-3" />
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Household</p>
+                      <h4 className="text-2xl font-black text-slate-900 font-headline">{detailsData.household?.length || 0}</h4>
+                    </div>
+                    <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100/50">
+                      <Car size={20} className="text-amber-600 mb-3" />
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Vehicles</p>
+                      <h4 className="text-2xl font-black text-slate-900 font-headline">{detailsData.vehicles?.length || 0}</h4>
+                    </div>
+                    <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100/50">
+                      <Cat size={20} className="text-emerald-600 mb-3" />
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pets</p>
+                      <h4 className="text-2xl font-black text-slate-900 font-headline">{detailsData.pets?.length || 0}</h4>
+                    </div>
+                  </div>
+
+                  {/* HouseHold Section */}
+                  <section>
+                    <div className="flex items-center justify-between mb-4">
+                      <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">Household Members</h5>
+                      <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-lg uppercase tracking-tight">Active Unit</span>
+                    </div>
+                    <div className="space-y-3">
+                      {detailsData.household?.map((member: any) => (
+                        <div key={member.id} className="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-100 transition-hover hover:border-indigo-100">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center font-bold text-slate-600 text-xs shadow-sm">
+                              {member.name.charAt(0)}
+                            </div>
+                            <div>
+                              <p className="font-black text-slate-900 text-sm leading-none">{member.name}</p>
+                              <p className="text-slate-500 text-[10px] mt-1 font-bold">{member.phone}</p>
+                            </div>
+                          </div>
+                          <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                            member.type === 'OWNER' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-500'
+                          }`}>
+                            {member.type}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  {/* Vehicles & Pets */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <section>
+                      <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Registered Vehicles</h5>
+                      <div className="space-y-3">
+                        {detailsData.vehicles?.length > 0 ? detailsData.vehicles.map((v: any) => (
+                          <div key={v.id} className="p-4 bg-amber-50/30 border border-amber-100/50 rounded-2xl">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Car size={14} className="text-amber-600" />
+                              <p className="font-black text-amber-900 text-xs uppercase">{v.vehicleType}</p>
+                            </div>
+                            <p className="font-headline font-black text-lg text-slate-900 leading-none">{v.numberPlate}</p>
+                            <p className="text-slate-500 text-[10px] font-bold mt-1 uppercase tracking-tight">{v.model}</p>
+                          </div>
+                        )) : (
+                          <div className="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                            <Car size={24} className="text-slate-300 mx-auto mb-2" />
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No Vehicles</p>
+                          </div>
+                        )}
+                      </div>
+                    </section>
+
+                    <section>
+                      <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Resident Pets</h5>
+                      <div className="space-y-3">
+                        {detailsData.pets?.length > 0 ? detailsData.pets.map((p: any) => (
+                          <div key={p.id} className="flex items-center gap-4 p-4 bg-emerald-50/30 border border-emerald-100/50 rounded-2xl">
+                             <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
+                               <Cat size={18} />
+                             </div>
+                             <div>
+                               <p className="font-black text-slate-900 text-sm leading-none">{p.name}</p>
+                               <p className="text-emerald-700 text-[10px] font-bold mt-1 uppercase tracking-tight">{p.type} • {p.breed}</p>
+                             </div>
+                          </div>
+                        )) : (
+                          <div className="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                            <Cat size={24} className="text-slate-300 mx-auto mb-2" />
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No Pets</p>
+                          </div>
+                        )}
+                      </div>
+                    </section>
+                  </div>
+
+                  {/* Actions & Verification */}
+                  <div className="p-8 bg-indigo-50/50 border border-indigo-100 rounded-[32px]">
+                    <div className="flex items-start gap-4">
+                      <ShieldCheck className="text-indigo-600 flex-shrink-0" size={24} />
+                      <div>
+                        <h4 className="font-black text-indigo-900 text-sm uppercase tracking-tight">Account Verification</h4>
+                        <p className="text-[10px] text-indigo-700/80 font-medium leading-relaxed mt-1">
+                          This resident is an approved member of the community with full access to {detailsData.household?.find((m: any) => m.name === detailsData.resident.name)?.type || 'Resident'} privileges.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {confirmDelete && (

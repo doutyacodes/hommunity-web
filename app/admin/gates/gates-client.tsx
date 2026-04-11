@@ -134,7 +134,7 @@ export default function GatesClient({ initialGates, initialGuards, initialShifts
                 <div className="flex -space-x-2">
                    {initialShifts.filter(s => s.gateId === gate.id).map(shift => {
                       const guard = initialGuards.find(g => g.id === shift.guardId);
-                      const days = shift.days.split(',').map((d: string) => d.charAt(0)).join('/');
+                      const days = (shift.days || '').split(',').map((d: string) => d.charAt(0)).join('/');
                       return (
                         <div key={shift.id} className="relative group/avatar">
                           <button 

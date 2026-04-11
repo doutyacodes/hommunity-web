@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/session";
 import { db } from "@/lib/db";
-import { buildingAdmins, gates, guards, securityShifts } from "@/lib/db/schema";
+import { buildingAdmins, gates, guards, securityShifts, securityShiftDays } from "@/lib/db/schema";
 import { eq, inArray } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import GatesClient from "./gates-client";
@@ -56,11 +56,25 @@ export default async function GatesPage() {
   const guardIds = guardData.map((g: Guard) => g.id);
   const shiftData =
     guardIds.length > 0
-      ? await db
+      ? await (async () => {
+        const shifts = await db
           .select()
           .from(securityShifts)
-          .where(inArray(securityShifts.guardId, guardIds))
-      : [];
+          .where(inArray(securityShifts.guardId, guardIds));
+        
+        // Fetch days for these shifts
+        const shiftIds = shifts.map((s: any) => s.id);
+        const shiftDays = shiftIds.length > 0 
+          ? await db.select().from(securityShiftDays).where(inArray(securityShiftDays.shiftId, shiftIds))
+          : [];
+
+        // Map days back to shifts as a comma-separated string for compatibility with GatesClient
+        return shifts.map((s: any) => ({
+          ...s,
+          days: shiftDays.filter((sd: any) => sd.shiftId === s.id).map((sd: any) => sd.day).join(',')
+        }));
+      })()
+    : [];
 
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto w-full animate-in fade-in duration-500">
