@@ -22,6 +22,7 @@ export async function GET(req: Request) {
     const rawShifts = await db.select({
       id: securityShifts.id,
       gateName: gates.name,
+      deliveryImageRequired: gates.deliveryImageRequired,
       start: securityShifts.startTime,
       end: securityShifts.endTime
     })
@@ -36,6 +37,7 @@ export async function GET(req: Request) {
         .where(eq(securityShiftDays.shiftId, s.id));
       return {
         gateName: s.gateName,
+        deliveryImageRequired: !!s.deliveryImageRequired,
         days: days.map((d: any) => d.day).join(","),
         start: s.start,
         end: s.end

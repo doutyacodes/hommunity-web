@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/session";
 import { db } from "@/lib/db";
 import { buildingAdmins, residents, apartmentResidents, apartments } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import ResidentsClient from "./residents-client";
 import { redirect } from "next/navigation";
 
@@ -35,7 +35,7 @@ export default async function ResidentsPage() {
 
   const buildingId = adminBuilding[0].buildingId;
 
-  // Fetch residents with their apartment data
+  // Fetch residents with their apartment data, sorted by latest registration first
   const residentData = await db.select({
     id: apartmentResidents.id,
     status: apartmentResidents.status,
@@ -50,7 +50,8 @@ export default async function ResidentsPage() {
   .from(apartmentResidents)
   .innerJoin(residents, eq(apartmentResidents.residentId, residents.id))
   .innerJoin(apartments, eq(apartmentResidents.apartmentId, apartments.id))
-  .where(eq(apartments.buildingId, buildingId));
+  .where(eq(apartments.buildingId, buildingId))
+  .orderBy(desc(apartmentResidents.createdAt));
 
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto w-full animate-in fade-in duration-500">

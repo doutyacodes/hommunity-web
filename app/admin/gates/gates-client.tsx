@@ -4,7 +4,7 @@ import { useActionState, useState, useTransition, useEffect } from "react";
 import { 
   Shield, Plus, X, Pencil, Trash2, MapPin, 
   DoorOpen, Check, AlertCircle, ChevronRight,
-  Users, Phone, Mail, Lock, UserCog
+  Users, Phone, Mail, Lock, UserCog, Camera
 } from "lucide-react";
 import { createGateAction, updateGateAction, deleteGateAction } from "@/lib/actions/gates";
 import { createGuardAction, updateGuardAction, deleteGuardAction } from "@/lib/actions/guards";
@@ -126,8 +126,19 @@ export default function GatesClient({ initialGates, initialGuards, initialShifts
               <h3 className="text-2xl font-black text-slate-900 font-headline uppercase tracking-tight mb-2">
                 {gate.name}
               </h3>
-              <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
-                <Shield size={12} className="text-indigo-500" /> Authorized Access Point
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
+                  <Shield size={12} className="text-indigo-500" /> Authorized Access Point
+                </div>
+                {gate.deliveryImageRequired ? (
+                  <div className="flex items-center gap-2 text-emerald-500 text-[10px] font-black uppercase tracking-widest bg-emerald-50 w-max px-2 py-0.5 rounded-lg border border-emerald-100">
+                    <Camera size={10} /> Image Required
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-widest bg-slate-50 w-max px-2 py-0.5 rounded-lg border border-slate-100">
+                    <Camera size={10} className="opacity-40" /> No Image Required
+                  </div>
+                )}
               </div>
 
                <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
@@ -290,6 +301,21 @@ export default function GatesClient({ initialGates, initialGuards, initialShifts
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gate Name</label>
               <input name="name" required placeholder="e.g. Main Entry Gate A" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 outline-none font-medium transition-all" />
             </div>
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
+                  <Camera size={18} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Delivery Image</p>
+                  <p className="text-[9px] text-slate-500 font-bold uppercase tracking-tight">Requirement for guards</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" name="deliveryImageRequired" defaultChecked className="sr-only peer" />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+              </label>
+            </div>
             {createGateState?.error && <div className="p-3 bg-red-50 text-red-600 text-xs rounded-xl font-bold">{createGateState.error}</div>}
             <ModalButtons isPending={createGatePending} onClose={() => setActiveModal(null)} label="Register Gate" />
           </form>
@@ -304,6 +330,21 @@ export default function GatesClient({ initialGates, initialGuards, initialShifts
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gate Name</label>
               <input name="name" defaultValue={targetItem?.name} required placeholder="e.g. West Exit" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 outline-none font-medium transition-all" />
+            </div>
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
+                  <Camera size={18} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Delivery Image</p>
+                  <p className="text-[9px] text-slate-500 font-bold uppercase tracking-tight">Requirement for guards</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" name="deliveryImageRequired" defaultChecked={targetItem?.deliveryImageRequired} className="sr-only peer" />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+              </label>
             </div>
             {updateGateState?.error && <div className="p-3 bg-red-50 text-red-600 text-xs rounded-xl font-bold">{updateGateState.error}</div>}
             <ModalButtons isPending={editGatePending} onClose={() => setActiveModal(null)} label="Save Changes" />

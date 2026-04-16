@@ -13,14 +13,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { name, email } = await req.json();
+    const body = await req.json();
+    const updateData: any = {};
+    
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.email !== undefined) updateData.email = body.email;
+    if (body.photoUrl !== undefined) updateData.photoUrl = body.photoUrl;
 
-    if (!name) {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: "No fields to update" }, { status: 400 });
     }
 
     await db.update(residents)
-      .set({ name, email })
+      .set(updateData)
       .where(eq(residents.id, session.userId as string));
 
     return NextResponse.json({

@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 export async function createGateAction(prevState: any, formData: FormData) {
   const buildingId = formData.get("buildingId") as string;
   const name = formData.get("name") as string;
+  const deliveryImageRequired = formData.get("deliveryImageRequired") === "on";
 
   if (!buildingId || !name) {
     return { error: "Missing required fields." };
@@ -17,6 +18,7 @@ export async function createGateAction(prevState: any, formData: FormData) {
     await db.insert(gates).values({
       buildingId,
       name,
+      deliveryImageRequired,
     });
     revalidatePath("/admin/gates");
     return { success: true };
@@ -29,13 +31,17 @@ export async function createGateAction(prevState: any, formData: FormData) {
 export async function updateGateAction(prevState: any, formData: FormData) {
   const id = formData.get("id") as string;
   const name = formData.get("name") as string;
+  const deliveryImageRequired = formData.get("deliveryImageRequired") === "on";
 
   if (!id || !name) {
     return { error: "Missing identity or name." };
   }
 
   try {
-    await db.update(gates).set({ name }).where(eq(gates.id, id));
+    await db.update(gates).set({ 
+      name,
+      deliveryImageRequired,
+    }).where(eq(gates.id, id));
     revalidatePath("/admin/gates");
     return { success: true };
   } catch (error) {

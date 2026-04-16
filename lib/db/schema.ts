@@ -23,6 +23,7 @@ export const residents = mysqlTable('residents', {
   phone: varchar('phone', { length: 20 }).notNull().unique(),
   email: varchar('email', { length: 255 }),
   pushToken: varchar('push_token', { length: 255 }),
+  photoUrl: text('photo_url'),
   passwordHash: varchar('password_hash', { length: 255 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
@@ -141,6 +142,7 @@ export const gates = mysqlTable('gates', {
   id: varchar('id', { length: 36 }).primaryKey().$defaultFn(() => randomUUID()),
   buildingId: varchar('building_id', { length: 36 }).notNull().references(() => buildings.id),
   name: varchar('name', { length: 255 }).notNull(),
+  deliveryImageRequired: boolean('delivery_image_required').default(true).notNull(),
 });
 
 export const securityShifts = mysqlTable('security_shifts', {
@@ -225,7 +227,11 @@ export const visitors = mysqlTable('visitors', {
     'DAILY_STAFF',
     'CAB_RIDE',
     'EVENT_BULK',
-    'UNINVITED'
+    'UNINVITED',
+    'GUEST',
+    'MAID',
+    'CAB',
+    'OTHER'
   ]).notNull(),
   associatedAgency: varchar('associated_agency', { length: 100 }), 
   
