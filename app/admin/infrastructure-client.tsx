@@ -199,7 +199,7 @@ export default function InfrastructureClient({ buildingId, data }: Infrastructur
                          </div>
                        </div>
                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                         {floor.blockId ? `Block: ${data.blocks.find(b => b.id === floor.blockId)?.name}` : 'Main Structure'}
+                         {floor.blockId ? `Block: ${data.blocks.find(b => b.id === floor.blockId)?.name}` : 'Unassigned Block'}
                        </p>
                      </div>
                    </div>
@@ -294,13 +294,12 @@ export default function InfrastructureClient({ buildingId, data }: Infrastructur
         >
           <form action={floorAction} onSubmit={() => { if(!createFloorState?.error) setActiveModal(null); }} className="space-y-6">
             <input type="hidden" name="buildingId" value={buildingId} />
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Assigned Block (Optional)</label>
-              <select name="blockId" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none font-medium">
-                <option value="">Main Structure</option>
-                {data.blocks.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
-            </div>
+             <div className="space-y-2">
+               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Block</label>
+               <select name="blockId" required className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none font-medium">
+                 {data.blocks.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+               </select>
+             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Floor Level</label>
               <input name="floorNumber" required placeholder="e.g. 1st, Ground, P1..." className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 outline-none font-medium" />
@@ -319,13 +318,12 @@ export default function InfrastructureClient({ buildingId, data }: Infrastructur
         >
           <form action={editFloorAction} onSubmit={() => { if(!updateFloorState?.error) setActiveModal(null); }} className="space-y-6">
             <input type="hidden" name="id" value={targetItem?.id} />
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Assigned Block</label>
-              <select name="blockId" defaultValue={targetItem?.blockId || "none"} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none font-medium">
-                <option value="none">Main Structure</option>
-                {data.blocks.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
-            </div>
+             <div className="space-y-2">
+               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Block</label>
+               <select name="blockId" defaultValue={targetItem?.blockId} required className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none font-medium">
+                 {data.blocks.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+               </select>
+             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Floor Level</label>
               <input name="floorNumber" defaultValue={targetItem?.floorNumber} required className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 outline-none font-medium" />
