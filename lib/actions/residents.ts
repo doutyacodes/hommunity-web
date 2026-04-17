@@ -41,7 +41,7 @@ export async function updateResidentStatusAction(id: string, status: "APPROVED" 
 
       for (const token of tokens) {
         if (token.pushToken) {
-          await sendPushNotification({
+          const result = await sendPushNotification({
             token: token.pushToken,
             title: title,
             body: body,
@@ -52,6 +52,7 @@ export async function updateResidentStatusAction(id: string, status: "APPROVED" 
               unitNumber: linkInfo.unitNumber
             }
           });
+          console.log(`📡 Auto-notification to ${linkInfo.residentName} (${status}): ${result.success ? "✅ Success" : "❌ Failed: " + result.error}`);
         }
       }
     }

@@ -65,6 +65,33 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: "Resident already registered for this unit" });
     }
 
+    // 4. Owner Constraint: Only one owner allowed per apartment
+    if (type === "OWNER") {
+      const [existingOwner] = await db.select()
+        .from(apartmentResidents)
+        .where(and(
+          eq(apartmentResidents.apartmentId, apartment.id),
+          eq(apartmentResidents.type, "OWNER"),
+          // status !== 'REJECTED' -- using neq wasn't imported, but we can check if it's NOT REJECTED
+          // actually, it's safer to check for active/pending statuses
+        ))
+        .limit(1);
+
+      // Refining check to exclude rejected ones properly
+      const owners = await db.select()
+        .from(apartmentResidents)
+        .where(and(
+          eq(apartmentResidents.apartmentId, apartment.id),
+          eq(apartmentResidents.type, "OWNER")
+        ));
+      
+      const activeOwner = owners.find((o: any) => o.status !== "REJECTED");
+
+      if (activeOwner) {
+        return NextResponse.json({ error: "This apartment already has a registered owner." }, { status: 400 });
+      }
+    }
+
     await db.insert(apartmentResidents).values({
       residentId: resident.id,
       apartmentId: apartment.id,
