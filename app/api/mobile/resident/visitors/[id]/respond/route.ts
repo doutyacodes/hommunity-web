@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { visitors, visitorLogs, eventLogs, guards, userPushTokens } from "@/lib/db/schema";
+import { visitors, visitorLogs, eventLogs, guards, userPushTokens, apartments, floors, blocks } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { decrypt } from "@/lib/session";
 import admin from 'firebase-admin';
@@ -56,7 +56,23 @@ export async function POST(
       metadata: { visitorId: visitor.id, residentId }
     });
 
-    // 5. Notify guards in the building
+    // 5. Fetch Apartment Details for the notification
+    const [apartmentDetail] = await db.select({
+      unit: apartments.unitNumber,
+      floor: floors.floorNumber,
+      block: blocks.name
+    })
+    .from(apartments)
+    .leftJoin(floors, eq(apartments.floorId, floors.id))
+    .leftJoin(blocks, eq(floors.blockId, blocks.id))
+    .where(eq(apartments.id, visitor.apartmentId))
+    .limit(1);
+
+    const locationStr = apartmentDetail 
+      ? `Unit ${apartmentDetail.unit}${apartmentDetail.floor ? `, ${apartmentDetail.floor} Floor` : ''}${apartmentDetail.block ? `, ${apartmentDetail.block}` : ''}`
+      : 'Unknown Unit';
+
+    // 6. Notify guards in the building
     const buildingGuards = await db.select({ id: guards.id })
       .from(guards)
       .where(eq(guards.buildingId, visitor.buildingId));
@@ -74,16 +90,17 @@ export async function POST(
       const tokens = guardTokens.map((gt: { token: string | null }) => gt.token).filter((t: string | null): t is string => !!t);
 
       if (tokens.length > 0) {
-        // Send a notification that includes a visual alert for the guard
+        const messageBody = `Visitor ${visitor.name} has been ${status === 'INSIDE' ? 'allowed' : 'declined'} by ${locationStr}.`;
+        
         await admin.messaging().sendEachForMulticast({
           tokens,
           notification: {
             title: status === 'INSIDE' ? "Visitor Approved" : "Visitor Denied",
-            body: `Visitor ${visitor.name} has been ${status === 'INSIDE' ? 'allowed' : 'declined'} by the resident.`,
+            body: messageBody,
           },
           data: {
             title: status === 'INSIDE' ? "Visitor Approved" : "Visitor Denied",
-            body: `Visitor ${visitor.name} has been ${status === 'INSIDE' ? 'allowed' : 'declined'} by the resident.`,
+            body: messageBody,
             type: "approval_update",
             visitorId
           }
@@ -91,7 +108,7 @@ export async function POST(
       }
     }
 
-    // 6. Notify other residents in the apartment (Family Sync)
+    // 7. Notify other residents in the apartment (Family Sync)
     await sendNotificationToApartment(visitor.apartmentId, {
       title: status === 'INSIDE' ? "Visitor Approved" : "Visitor Denied",
       body: `Visitor ${visitor.name} has been ${status === 'INSIDE' ? 'allowed' : 'declined'} by a resident.`,
