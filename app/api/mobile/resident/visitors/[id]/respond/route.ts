@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { visitors, visitorLogs, eventLogs, guards } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { visitors, visitorLogs, eventLogs, guards, userPushTokens } from "@/lib/db/schema";
+import { eq, and, inArray } from "drizzle-orm";
 import { decrypt } from "@/lib/session";
 import admin from 'firebase-admin';
 
@@ -56,22 +56,38 @@ export async function POST(
     });
 
     // 5. Notify guards in the building
-    const buildingGuards = await db.select({ token: guards.pushToken })
+    const buildingGuards = await db.select({ id: guards.id })
       .from(guards)
       .where(eq(guards.buildingId, visitor.buildingId));
 
-    const tokens = buildingGuards.map((g: any) => g.token).filter((t: any): t is string => !!t);
+    const guardIds = buildingGuards.map(g => g.id);
 
-    if (tokens.length > 0) {
-      await admin.messaging().sendEachForMulticast({
-        tokens,
-        data: {
-          title: status === 'INSIDE' ? "Visitor Approved" : "Visitor Denied",
-          body: `Visitor ${visitor.name} has been ${status === 'INSIDE' ? 'allowed' : 'declined'} by the resident.`,
-          type: "approval_update",
-          visitorId
-        }
-      });
+    if (guardIds.length > 0) {
+      const guardTokens = await db.select({ token: userPushTokens.pushToken })
+        .from(userPushTokens)
+        .where(and(
+          inArray(userPushTokens.userId, guardIds),
+          eq(userPushTokens.userType, 'GUARD')
+        ));
+
+      const tokens = guardTokens.map(gt => gt.token).filter((t): t is string => !!t);
+
+      if (tokens.length > 0) {
+        // Send a notification that includes a visual alert for the guard
+        await admin.messaging().sendEachForMulticast({
+          tokens,
+          notification: {
+            title: status === 'INSIDE' ? "Visitor Approved" : "Visitor Denied",
+            body: `Visitor ${visitor.name} has been ${status === 'INSIDE' ? 'allowed' : 'declined'} by the resident.`,
+          },
+          data: {
+            title: status === 'INSIDE' ? "Visitor Approved" : "Visitor Denied",
+            body: `Visitor ${visitor.name} has been ${status === 'INSIDE' ? 'allowed' : 'declined'} by the resident.`,
+            type: "approval_update",
+            visitorId
+          }
+        });
+      }
     }
 
     return NextResponse.json({ success: true, message: `Visitor ${status}` });
