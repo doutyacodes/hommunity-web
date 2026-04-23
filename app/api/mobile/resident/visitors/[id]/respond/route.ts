@@ -4,6 +4,7 @@ import { visitors, visitorLogs, eventLogs, guards, userPushTokens } from "@/lib/
 import { eq, and, inArray } from "drizzle-orm";
 import { decrypt } from "@/lib/session";
 import admin from 'firebase-admin';
+import { sendNotificationToApartment } from "@/lib/utils/notifications";
 
 export async function POST(
   req: Request,
@@ -89,6 +90,15 @@ export async function POST(
         });
       }
     }
+
+    // 6. Notify other residents in the apartment (Family Sync)
+    await sendNotificationToApartment(visitor.apartmentId, {
+      title: status === 'INSIDE' ? "Visitor Approved" : "Visitor Denied",
+      body: `Visitor ${visitor.name} has been ${status === 'INSIDE' ? 'allowed' : 'declined'} by a resident.`,
+      type: "approval_update",
+      referenceId: visitorId,
+      payloadData: { visitorId, status }
+    });
 
     return NextResponse.json({ success: true, message: `Visitor ${status}` });
 
