@@ -61,7 +61,7 @@ export async function POST(
       .from(guards)
       .where(eq(guards.buildingId, visitor.buildingId));
 
-    const guardIds = buildingGuards.map(g => g.id);
+    const guardIds = buildingGuards.map((g: { id: string }) => g.id);
 
     if (guardIds.length > 0) {
       const guardTokens = await db.select({ token: userPushTokens.pushToken })
@@ -71,7 +71,7 @@ export async function POST(
           eq(userPushTokens.userType, 'GUARD')
         ));
 
-      const tokens = guardTokens.map(gt => gt.token).filter((t): t is string => !!t);
+      const tokens = guardTokens.map((gt: { token: string | null }) => gt.token).filter((t: string | null): t is string => !!t);
 
       if (tokens.length > 0) {
         // Send a notification that includes a visual alert for the guard
