@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Inter, Manrope } from "next/font/google";
+import { Geist_Mono, Inter, Manrope, Outfit, Syne, DM_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", weight: ["400", "700", "800"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const syne = Syne({ subsets: ["latin"], variable: "--font-syne" });
+const dmMono = DM_Mono({ subsets: ["latin"], variable: "--font-dm-mono", weight: ["400", "500"] });
 
 export const metadata: Metadata = {
   title: "Hommunity — Architectural Ledger",
@@ -18,7 +21,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full antialiased", inter.variable, manrope.variable, geistMono.variable)}
+      className={cn(
+        "h-full antialiased",
+        inter.variable,
+        manrope.variable,
+        geistMono.variable,
+        outfit.variable,
+        syne.variable,
+        dmMono.variable
+      )}
     >
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         <link
